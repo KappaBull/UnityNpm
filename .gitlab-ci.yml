@@ -1,0 +1,10 @@
+image: kappabull/unitynpmci:latest
+update_repository:
+  only:
+    - triggers
+    - schedules
+  script:
+    - echo "Host github.com
+    IdentityFile ~/.ssh/github_id_rsa" > ~/.ssh/config
+    - echo $SSHKEY > /.ssh/github_id_rsa
+    - /usr/local/bin/uniNpmCI
