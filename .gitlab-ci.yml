@@ -1,8 +1,7 @@
 image: kappabull/unitynpmci:latest
 update_repository:
   only:
-    - triggers
-    - schedules
+    - master
   script:
     - echo "Host github.com¥nIdentityFile ~/.ssh/github_id_rsa" > ~/.ssh/config
     - echo $SSHKEY > /.ssh/github_id_rsa
