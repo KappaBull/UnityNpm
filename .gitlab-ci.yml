@@ -5,5 +5,7 @@ update_repository:
   script:
     - echo $SSHKEY > ~/.ssh/github_id_rsa
     - chmod 600 ~/.ssh/github_id_rsa
+    - eval `ssh-agent`
+    - ssh-add ~/.ssh/github_id_rsa
     - ssh-keyscan github.com > ~/.ssh/known_hosts
     - /usr/local/bin/uniNpmCI
