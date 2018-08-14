@@ -8,4 +8,6 @@ update_repository:
     - eval `ssh-agent`
     # - ssh-add ~/.ssh/github_id_rsa
     - ssh-keyscan github.com > ~/.ssh/known_hosts
+    - ssh -vT git@github.com
+    - ssh-add -l
     - /usr/local/bin/uniNpmCI
