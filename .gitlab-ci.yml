@@ -2,12 +2,3 @@ image: kappabull/unitynpmci:latest
 update_repository:
   only:
     - master
-  script:
-    # - echo $SSHKEY > ~/.ssh/github_id_rsa
-    # - chmod 600 ~/.ssh/github_id_rsa
-    # - eval `ssh-agent`
-    # # - ssh-add ~/.ssh/github_id_rsa
-    # - ssh-keyscan github.com > ~/.ssh/known_hosts
-    # - ssh -vT git@github.com
-    # - ssh-add -l
-    - /usr/local/bin/uniNpmCI
