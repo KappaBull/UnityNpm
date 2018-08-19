@@ -3,4 +3,4 @@ update_repository:
   only:
     - master
   script:
-    - ./uniNpmCI
+    - /usr/local/bin/uniNpmCI
