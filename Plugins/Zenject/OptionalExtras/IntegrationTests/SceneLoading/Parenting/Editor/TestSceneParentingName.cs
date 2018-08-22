@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -7,11 +8,11 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using ModestTree;
 using UnityEngine.SceneManagement;
+using UnityEngine.TestTools;
 using Assert=ModestTree.Assert;
 
 namespace Zenject.Tests.SceneParenting
 {
-    [TestFixture]
     public class TestSceneParentingName
     {
         const string CommonFolderPath = "Assets/Plugins/Zenject/OptionalExtras/IntegrationTests/SceneLoading/Parenting";
@@ -21,34 +22,38 @@ namespace Zenject.Tests.SceneParenting
         Scene _childScene;
         Scene _parentScene;
 
-        [Test]
-        public void TestValidationPass()
+        [UnityTest]
+        public IEnumerator TestValidationPass()
         {
             ZenUnityEditorUtil.ValidateCurrentSceneSetup();
+            yield break;
         }
 
-        [Test]
-        public void TestValidationFail()
+        [UnityTest]
+        public IEnumerator TestValidationFail()
         {
             _parentScene.GetRootGameObjects().Where(x => x.name == "Foo")
                 .Single().GetComponent<ZenjectBinding>().enabled = false;
 
             Assert.Throws(() => ZenUnityEditorUtil.ValidateCurrentSceneSetup());
+            yield break;
         }
 
-        [Test]
-        public void TestSuccess()
+        [UnityTest]
+        public IEnumerator TestSuccess()
         {
             ZenUnityEditorUtil.RunCurrentSceneSetup();
+            yield break;
         }
 
-        [Test]
-        public void TestFail()
+        [UnityTest]
+        public IEnumerator TestFail()
         {
             _parentScene.GetRootGameObjects().Where(x => x.name == "Foo")
                 .Single().GetComponent<ZenjectBinding>().enabled = false;
 
             Assert.Throws(() => ZenUnityEditorUtil.RunCurrentSceneSetup());
+            yield break;
         }
 
         [SetUp]
