@@ -3,8 +3,8 @@
  * Project: Graphy - Ultimate Stats Monitor
  * Date: 23-Dec-17
  * Studio: Tayx
- * Unauthorized copying of this file, via any medium is strictly prohibited
- * Proprietary and confidential
+ * This project is released under the MIT license.
+ * Attribution is not required, but it is always welcomed!
  * -------------------------------------*/
 
 using UnityEngine;
@@ -356,8 +356,6 @@ namespace Tayx.Graphy
         /// </summary>
         private void CheckDebugPackets()
         {
-            List<DebugPacket> debugPacketsToRemove = new List<DebugPacket>();
-
             foreach (DebugPacket packet in m_debugPackets)
             {
                 if (packet.Active)
@@ -385,7 +383,7 @@ namespace Tayx.Graphy
 
                                     if (packet.ExecuteOnce)
                                     {
-                                        debugPacketsToRemove.Add(packet);
+                                        m_debugPackets[m_debugPackets.IndexOf(packet)] = null;
                                     }
                                 }
                                 break;
@@ -399,7 +397,7 @@ namespace Tayx.Graphy
 
                                         if (packet.ExecuteOnce)
                                         {
-                                            debugPacketsToRemove.Add(packet);
+                                            m_debugPackets[m_debugPackets.IndexOf(packet)] = null;
                                         }
 
                                         break;
@@ -411,10 +409,7 @@ namespace Tayx.Graphy
                 }
             }
 
-            foreach (var packetToRemove in debugPacketsToRemove)
-            {
-                m_debugPackets.Remove(packetToRemove);
-            }
+            m_debugPackets.RemoveAll((packet) => packet == null);
         }
 
         /// <summary>
