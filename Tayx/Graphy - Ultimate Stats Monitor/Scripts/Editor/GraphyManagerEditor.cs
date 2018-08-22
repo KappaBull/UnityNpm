@@ -3,8 +3,8 @@
  * Project: Graphy - Ultimate Stats Monitor
  * Date: 20-Dec-17
  * Studio: Tayx
- * Unauthorized copying of this file, via any medium is strictly prohibited
- * Proprietary and confidential
+ * This project is released under the MIT license.
+ * Attribution is not required, but it is always welcomed!
  * -------------------------------------*/
  
 using System;
@@ -41,7 +41,9 @@ namespace Tayx.Graphy
         };
 
         private SerializedProperty m_graphyMode;
-        
+
+        private SerializedProperty m_enableOnStartup;
+
         private SerializedProperty m_keepAlive;
 
         private SerializedProperty m_background;
@@ -130,11 +132,11 @@ namespace Tayx.Graphy
         {
             m_target = (GraphyManager)target;
 
-            LoadGuiStyles();
-
             SerializedObject serObj = serializedObject;
 
             m_graphyMode = serObj.FindProperty("m_graphyMode");
+
+            m_enableOnStartup = serObj.FindProperty("m_enableOnStartup");
 
             m_keepAlive = serObj.FindProperty("m_keepAlive");
 
@@ -217,11 +219,11 @@ namespace Tayx.Graphy
                 return;
             }
 
+            LoadGuiStyles();
+
             float defaultLabelWidth = EditorGUIUtility.labelWidth;
             float defaultFieldWidth = EditorGUIUtility.fieldWidth;
             
-            
-
             GUIStyle foldoutStyle = new GUIStyle(EditorStyles.foldout);
 
             foldoutStyle.font = m_headerStyle2.font;
@@ -260,6 +262,8 @@ namespace Tayx.Graphy
             EditorGUILayout.PropertyField(m_graphyMode, new GUIContent("Graphy Mode", "LIGHT mode increases compatibility with older GPUs, but reduces the maximum graph resolutions to 128."));
 
             GUILayout.Space(10);
+
+            m_enableOnStartup.boolValue = EditorGUILayout.Toggle(new GUIContent("Enable On Startup", "If ticked, Graphy will be displayed by default on startup, otherwise it will initiate and hide."), m_enableOnStartup.boolValue);
 
             m_keepAlive.boolValue = EditorGUILayout.Toggle(new GUIContent("Keep Alive", "If ticked, it will survive scene changes. Careful, if you set Graphy as a chilof another GameObject, the root GameObject will also survive scene changes. If you want to avoid that put Graphy in the root of the Scene as its own entity."), m_keepAlive.boolValue);
                
