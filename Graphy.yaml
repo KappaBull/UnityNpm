@@ -5,4 +5,4 @@ package:
   description: "Graphy is the ultimate, easy to use, feature packed stats monitor and debugger for your Unity project."
 license: /LICENSE
 copy:
-  - /UnityProject/Assets/Tayx
+  - /Assets/Tayx
