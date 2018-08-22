@@ -5,8 +5,12 @@
         "Zenject-TestFramework-Editor",
         "Zenject-TestFramework"
     ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
     "includePlatforms": [
         "Editor"
     ],
-    "excludePlatforms": []
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
 }

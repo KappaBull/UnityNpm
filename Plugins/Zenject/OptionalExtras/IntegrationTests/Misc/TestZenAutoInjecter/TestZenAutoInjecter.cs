@@ -9,6 +9,12 @@ using UnityEngine.TestTools;
 
 namespace Zenject.Tests.AutoInjecter
 {
+    public class Foo
+    {
+        [Inject]
+        public DiContainer Container;
+    }
+
 #if UNITY_EDITOR
     public class TestZenAutoInjecter : ZenjectIntegrationTestFixture
     {

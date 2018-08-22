@@ -35,11 +35,11 @@ namespace Zenject.Internal
                     {
                         if (immediate)
                         {
-                            GameObject.DestroyImmediate(rootObj);
+                            GameObject.Destroy(rootObj);
                         }
                         else
                         {
-                            GameObject.Destroy(rootObj);
+                            GameObject.DestroyImmediate(rootObj);
                         }
                     }
                 }
