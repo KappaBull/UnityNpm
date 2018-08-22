@@ -83,8 +83,8 @@ namespace Zenject.Tests.Factories
 
             new GameObject().AddComponent<Foo>();
 
-            // Multiple
-            Assert.Throws(() => factory.Create());
+            // Multiple is ok too to mirror unity's GetComponentsInChildren behaviour
+            factory.Create();
             yield break;
         }
 
@@ -360,7 +360,7 @@ namespace Zenject.Tests.Factories
         public IEnumerator TestToSubContainerPrefabSelf()
         {
             PreInstall();
-            Container.BindFactory<Foo, Foo.Factory>().FromSubContainerResolve().ByNewPrefab(FooSubContainerPrefab);
+            Container.BindFactory<Foo, Foo.Factory>().FromSubContainerResolve().ByNewContextPrefab(FooSubContainerPrefab);
 
             PostInstall();
 
@@ -376,7 +376,7 @@ namespace Zenject.Tests.Factories
         {
             PreInstall();
             Container.BindFactory<IFoo, IFooFactory>()
-                .To<Foo>().FromSubContainerResolve().ByNewPrefab(FooSubContainerPrefab);
+                .To<Foo>().FromSubContainerResolve().ByNewContextPrefab(FooSubContainerPrefab);
 
             PostInstall();
 
@@ -486,7 +486,10 @@ namespace Zenject.Tests.Factories
         public class Foo2 : MonoBehaviour
         {
             [Inject]
-            int _value;
+            public int Value
+            {
+                get; private set;
+            }
 
             public class Factory : PlaceholderFactory<Foo2>
             {

@@ -35,10 +35,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="JetBrains.Annotations, Version=11.0.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\NonUnityBuild\packages\JetBrains.Annotations.11.0.0\lib\net20\JetBrains.Annotations.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -53,11 +49,22 @@
     <Compile Include="Binding\Binders\ConcreteIdArgNonLazyBinder.cs" />
     <Compile Include="Binding\Binders\ConditionCopyNonLazyBinder.cs" />
     <Compile Include="Binding\Binders\CopyNonLazyBinder.cs" />
-    <Compile Include="Binding\Binders\Factory\FactoryArgumentsBinder.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryArgumentsToChoiceBinder\FactoryArgumentsToChoiceBinder0.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryArgumentsToChoiceBinder\FactoryArgumentsToChoiceBinder1.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryArgumentsToChoiceBinder\FactoryArgumentsToChoiceBinder10.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryArgumentsToChoiceBinder\FactoryArgumentsToChoiceBinder2.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryArgumentsToChoiceBinder\FactoryArgumentsToChoiceBinder3.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryArgumentsToChoiceBinder\FactoryArgumentsToChoiceBinder4.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryArgumentsToChoiceBinder\FactoryArgumentsToChoiceBinder5.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryArgumentsToChoiceBinder\FactoryArgumentsToChoiceBinder6.cs" />
     <Compile Include="Binding\Binders\Factory\FactoryFromBinder\FactoryFromBinder10.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryFromBinder\FactoryFromBinder6.cs" />
     <Compile Include="Binding\Binders\Factory\FactoryFromBinder\SubContainerBinder\FactorySubContainerBinder10.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryFromBinder\SubContainerBinder\FactorySubContainerBinder6.cs" />
     <Compile Include="Binding\Binders\Factory\FactoryFromBinder\Untyped\FactoryFromBinderUntyped.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryToChoiceBinder\DecoratorToChoiceFromBinder.cs" />
     <Compile Include="Binding\Binders\Factory\FactoryToChoiceBinder\FactoryToChoiceBinder10.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryToChoiceBinder\FactoryToChoiceBinder6.cs" />
     <Compile Include="Binding\Binders\Factory\FactoryToChoiceIdBinder\FactoryToChoiceIdBinder0.cs" />
     <Compile Include="Binding\Binders\Factory\FactoryToChoiceIdBinder\FactoryToChoiceIdBinder1.cs" />
     <Compile Include="Binding\Binders\Factory\FactoryToChoiceIdBinder\FactoryToChoiceIdBinder10.cs" />
@@ -65,6 +72,7 @@
     <Compile Include="Binding\Binders\Factory\FactoryToChoiceIdBinder\FactoryToChoiceIdBinder3.cs" />
     <Compile Include="Binding\Binders\Factory\FactoryToChoiceIdBinder\FactoryToChoiceIdBinder4.cs" />
     <Compile Include="Binding\Binders\Factory\FactoryToChoiceIdBinder\FactoryToChoiceIdBinder5.cs" />
+    <Compile Include="Binding\Binders\Factory\FactoryToChoiceIdBinder\FactoryToChoiceIdBinder6.cs" />
     <Compile Include="Binding\Binders\Factory\PlaceholderFactoryBindingFinalizer.cs" />
     <Compile Include="Binding\Binders\Factory\Pooling\MemoryPoolBindingFinalizer.cs" />
     <Compile Include="Binding\Binders\Factory\Pooling\MemoryPoolExpandBinder.cs" />
@@ -88,18 +96,19 @@
     <Compile Include="Factories\Pooling\MemoryPoolBase.cs" />
     <Compile Include="Factories\Pooling\PoolableMemoryPool.cs" />
     <Compile Include="Factories\Pooling\PoolFactory.cs" />
-    <Compile Include="Factories\Pooling\Static\DisposeWrapper.cs" />
+    <Compile Include="Factories\Pooling\Static\PoolableStaticMemoryPool.cs" />
     <Compile Include="Factories\Pooling\Static\StaticMemoryPool.cs" />
     <Compile Include="Factories\Pooling\Util\DictionaryPool.cs" />
     <Compile Include="Factories\Pooling\Util\HashSetPool.cs" />
     <Compile Include="Factories\Pooling\Util\ListPool.cs" />
     <Compile Include="Factories\Pooling\Util\PoolCleanupChecker.cs" />
     <Compile Include="Factories\Pooling\Util\StaticMemoryPoolRegistry.cs" />
-    <Compile Include="Injection\LazyWrapper.cs" />
+    <Compile Include="Injection\LazyInject.cs" />
+    <Compile Include="Install\Contexts\StaticContext.cs" />
     <Compile Include="Install\InstallerBase.cs" />
     <Compile Include="Install\MonoInstallerBase.cs" />
     <Compile Include="Install\ScriptableObjectInstallerBase.cs" />
-    <Compile Include="Install\StandardInterfacesRootInstaller.cs" />
+    <Compile Include="Install\ZenjectManagersInstaller.cs" />
     <Compile Include="Internal\Assert.cs" />
     <Compile Include="Internal\Func.cs" />
     <Compile Include="Internal\LinqExtensions.cs" />
@@ -138,11 +147,16 @@
     <Compile Include="Main\LazyInstanceInjector.cs" />
     <Compile Include="Main\SingletonMarkRegistry.cs" />
     <Compile Include="Main\ZenjectSettings.cs" />
+    <Compile Include="Providers\CachedOpenTypeProvider.cs" />
+    <Compile Include="Providers\Decorator\DecoratorProvider.cs" />
     <Compile Include="Providers\IFactoryProvider.cs" />
+    <Compile Include="Providers\MethodMultipleProviderUntyped.cs" />
     <Compile Include="Providers\MethodProviderMultiple.cs" />
     <Compile Include="Providers\MethodProviderUntyped.cs" />
+    <Compile Include="Providers\PoolableMemoryPoolProvider.cs" />
     <Compile Include="Runtime\GuiRenderableManager.cs" />
     <Compile Include="Runtime\Kernels\Kernel.cs" />
+    <Compile Include="Runtime\PoolableManager.cs" />
     <Compile Include="Util\ActionInstaller.cs" />
     <Compile Include="Util\DisposeBlock.cs" />
     <Compile Include="Util\ProfileBlock.cs" />
@@ -199,8 +213,6 @@
     <Compile Include="Binding\Finalizers\SubContainerInstallerBindingFinalizer.cs" />
     <Compile Include="Binding\Finalizers\PrefabBindingFinalizer.cs" />
     <Compile Include="Binding\Finalizers\PrefabResourceBindingFinalizer.cs" />
-    <Compile Include="Binding\Finalizers\SubContainerPrefabBindingFinalizer.cs" />
-    <Compile Include="Binding\Finalizers\SubContainerPrefabResourceBindingFinalizer.cs" />
     <Compile Include="Binding\Finalizers\SubContainerMethodBindingFinalizer.cs" />
     <Compile Include="Binding\Binders\Factory\FactoryFromBinderBase.cs" />
     <Compile Include="Binding\Binders\Factory\FactoryFromBinder\SubContainerBinder\FactorySubContainerBinder0.cs" />

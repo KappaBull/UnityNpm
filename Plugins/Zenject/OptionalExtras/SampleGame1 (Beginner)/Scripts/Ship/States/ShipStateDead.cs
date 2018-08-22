@@ -6,14 +6,6 @@ using Random=UnityEngine.Random;
 
 namespace Zenject.Asteroids
 {
-    public class ExplosionFactory : GameObjectFactory
-    {
-    }
-
-    public class BrokenShipFactory : GameObjectFactory
-    {
-    }
-
     public class ShipStateDead : ShipState
     {
         readonly SignalBus _signalBus;
@@ -41,12 +33,15 @@ namespace Zenject.Asteroids
         public override void Start()
         {
             _ship.MeshRenderer.enabled = false;
-            _ship.ParticleEmitter.gameObject.SetActive(false);
 
-            _explosion = _explosionFactory.Create();
+#if !UNITY_2018
+            _ship.ParticleEmitter.gameObject.SetActive(false);
+#endif
+
+            _explosion = _explosionFactory.Create().gameObject;
             _explosion.transform.position = _ship.Position;
 
-            _shipBroken = _brokenShipFactory.Create();
+            _shipBroken = _brokenShipFactory.Create().gameObject;
             _shipBroken.transform.position = _ship.Position;
             _shipBroken.transform.rotation = _ship.Rotation;
 
@@ -63,7 +58,10 @@ namespace Zenject.Asteroids
         public override void Dispose()
         {
             _ship.MeshRenderer.enabled = true;
+
+#if !UNITY_2018
             _ship.ParticleEmitter.gameObject.SetActive(true);
+#endif
 
             GameObject.Destroy(_explosion);
             GameObject.Destroy(_shipBroken);

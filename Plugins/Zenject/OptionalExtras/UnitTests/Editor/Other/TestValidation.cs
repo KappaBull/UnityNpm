@@ -23,7 +23,6 @@ namespace Zenject.Tests
             Container = new DiContainer(true);
             Container.Settings = new ZenjectSettings(
                 ValidationErrorResponses.Throw, RootResolveMethods.All);
-            Container.BindInstance(Container.Settings);
         }
 
         [Test]
@@ -177,7 +176,7 @@ namespace Zenject.Tests
         public class Jaze
         {
             [Inject]
-            public Lazy<Qux> Qux;
+            public LazyInject<Qux> Qux;
         }
 
         public class QuxInstaller : Installer<QuxInstaller>
