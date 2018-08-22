@@ -5,3 +5,4 @@ UnityのPackageフォルダ対応のサブモジュール用ブランチを更�
 
 ## CheckRepository
 - [Zenject](https://github.com/svermeulen/Zenject)
+- [Graphy](https://github.com/Tayx94/graphy)

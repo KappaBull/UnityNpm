@@ -1,0 +1,8 @@
+repository: https://github.com/Tayx94/graphy.git
+check: tag
+package:
+  name: com.github.tayx94.graphy
+  description: "Graphy is the ultimate, easy to use, feature packed stats monitor and debugger for your Unity project."
+license: /LICENSE
+copy:
+  - /UnityProject/Assets/Tayx
