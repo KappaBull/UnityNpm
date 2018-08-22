@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,8 +37,8 @@ namespace Zenject.Tests
             var totalNumGameObjects =
                 SceneManager.GetActiveScene().GetRootGameObjects().Count();
 
-            // -2 because the test runner and scene context
-            Assert.IsEqual(totalNumGameObjects - 2, expectedNumGameObjects);
+            // -1 because the scene context
+            Assert.IsEqual(totalNumGameObjects - 1, expectedNumGameObjects);
         }
 
         public static void AssertComponentCount<TComponent>(
@@ -50,7 +52,7 @@ namespace Zenject.Tests
 
             Assert.IsEqual(actualCount, expectedNumComponents,
                 "Expected to find '{0}' components of type '{1}' but instead found '{2}'"
-                .Fmt(expectedNumComponents, typeof(TComponent).Name(), actualCount));
+                .Fmt(expectedNumComponents, typeof(TComponent).PrettyName(), actualCount));
         }
 
         public static void AssertResolveCount<TContract>(
@@ -59,13 +61,15 @@ namespace Zenject.Tests
             var actualCount = container.ResolveAll<TContract>().Count;
             Assert.That(actualCount == expectedNum,
                 "Expected to find '{0}' instances of type '{1}' but instead found '{2}'",
-                expectedNum, typeof(TContract).Name(), actualCount);
+                expectedNum, typeof(TContract).PrettyName(), actualCount);
         }
 
         public static void CallFactoryCreateMethod<TValue, TFactory>(DiContainer container)
-            where TFactory : Factory<TValue>
+            where TFactory : PlaceholderFactory<TValue>
         {
             container.Resolve<TFactory>().Create();
         }
     }
 }
+
+#endif

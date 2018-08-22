@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+
+using System;
 using UnityEngine.TestTools;
 using System.Collections;
 using System.Collections.Generic;
@@ -45,7 +47,7 @@ namespace Zenject.Tests.Bindings
         public IEnumerator TestCached()
         {
             PreInstall();
-            Container.Bind<Texture>().FromResource(ResourcePath).AsCached();
+            Container.Bind<Texture>().FromResource(ResourcePath).AsSingle();
 
             Container.Bind<Runner>().FromNewComponentOnNewGameObject().AsSingle().WithArguments(1).NonLazy();
 
@@ -57,8 +59,7 @@ namespace Zenject.Tests.Bindings
         public IEnumerator TestSingle()
         {
             PreInstall();
-            Container.Bind<Texture>().FromResource(ResourcePath).AsSingle();
-            Container.Bind<Texture>().FromResource(ResourcePath).AsSingle();
+            Container.Bind(typeof(Texture), typeof(Texture)).To<Texture>().FromResource(ResourcePath).AsSingle();
 
             Container.Bind<Runner>().FromNewComponentOnNewGameObject().AsSingle().WithArguments(2).NonLazy();
 
@@ -107,3 +108,5 @@ namespace Zenject.Tests.Bindings
         }
     }
 }
+
+#endif

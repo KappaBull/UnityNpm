@@ -6,8 +6,8 @@ namespace Zenject.SpaceFighter
 {
     public class PlayerHealthWatcher : ITickable
     {
-        readonly PlayerDiedSignal _playerDiedSignal;
-        readonly IAudioPlayer _audioPlayer;
+        readonly SignalBus _signalBus;
+        readonly AudioPlayer _audioPlayer;
         readonly Settings _settings;
         readonly Explosion.Pool _explosionPool;
         readonly Player _player;
@@ -16,10 +16,10 @@ namespace Zenject.SpaceFighter
             Player player,
             Explosion.Pool explosionPool,
             Settings settings,
-            IAudioPlayer audioPlayer,
-            PlayerDiedSignal playerDiedSignal)
+            AudioPlayer audioPlayer,
+            SignalBus signalBus)
         {
-            _playerDiedSignal = playerDiedSignal;
+            _signalBus = signalBus;
             _audioPlayer = audioPlayer;
             _settings = settings;
             _explosionPool = explosionPool;
@@ -43,7 +43,7 @@ namespace Zenject.SpaceFighter
 
             _player.Renderer.enabled = false;
 
-            _playerDiedSignal.Fire();
+            _signalBus.Fire<PlayerDiedSignal>();
 
             _audioPlayer.Play(_settings.DeathSound, _settings.DeathSoundVolume);
         }

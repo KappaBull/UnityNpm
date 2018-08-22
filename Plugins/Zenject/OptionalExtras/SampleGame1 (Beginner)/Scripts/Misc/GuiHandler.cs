@@ -19,9 +19,6 @@ namespace Zenject.Asteroids
         GUIStyle _instructionsStyle;
 
         [SerializeField]
-        GUIStyle _gameOverStyle;
-
-        [SerializeField]
         GUIStyle _timeStyle;
 
         [SerializeField]
@@ -37,14 +34,14 @@ namespace Zenject.Asteroids
         float _restartTextFadeInTime;
 
         float _gameOverElapsed;
-        ShipCrashedSignal _shipCrashedSignal;
+        SignalBus _signalBus;
 
         [Inject]
         public void Construct(
-            GameController gameController, ShipCrashedSignal shipCrashedSignal)
+            GameController gameController, SignalBus signalBus)
         {
             _gameController = gameController;
-            _shipCrashedSignal = shipCrashedSignal;
+            _signalBus = signalBus;
         }
 
         void OnGUI()
@@ -206,12 +203,12 @@ namespace Zenject.Asteroids
 
         public void Initialize()
         {
-            _shipCrashedSignal += OnShipCrashed;
+            _signalBus.Subscribe<ShipCrashedSignal>(OnShipCrashed);
         }
 
         public void Dispose()
         {
-            _shipCrashedSignal -= OnShipCrashed;
+            _signalBus.Unsubscribe<ShipCrashedSignal>(OnShipCrashed);
         }
 
         void OnShipCrashed()

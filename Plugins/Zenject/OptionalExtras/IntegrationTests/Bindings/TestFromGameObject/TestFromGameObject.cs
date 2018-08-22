@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+
+using System;
 using UnityEngine.TestTools;
 using System.Collections;
 using System.Collections.Generic;
@@ -32,8 +34,7 @@ namespace Zenject.Tests.Bindings
         public IEnumerator TestSingle()
         {
             PreInstall();
-            Container.Bind<Foo>().FromNewComponentOnNewGameObject().WithGameObjectName(GameObjName).AsSingle().NonLazy();
-            Container.Bind<IFoo>().To<Foo>().FromNewComponentOnNewGameObject().WithGameObjectName(GameObjName).AsSingle().NonLazy();
+            Container.Bind(typeof(IFoo), typeof(Foo)).To<Foo>().FromNewComponentOnNewGameObject().WithGameObjectName(GameObjName).AsSingle().NonLazy();
 
             PostInstall();
 
@@ -75,7 +76,7 @@ namespace Zenject.Tests.Bindings
         {
             PreInstall();
             Container.Bind(typeof(Foo), typeof(IFoo)).To<Foo>()
-                .FromNewComponentOnNewGameObject().WithGameObjectName(GameObjName).AsCached().NonLazy();
+                .FromNewComponentOnNewGameObject().WithGameObjectName(GameObjName).AsSingle().NonLazy();
 
             PostInstall();
 
@@ -119,7 +120,7 @@ namespace Zenject.Tests.Bindings
         {
             PreInstall();
             Container.Bind(typeof(IFoo), typeof(IBar)).To(new List<Type>() {typeof(Foo), typeof(Bar)}).FromNewComponentOnNewGameObject()
-                .WithGameObjectName(GameObjName).AsCached().NonLazy();
+                .WithGameObjectName(GameObjName).AsSingle().NonLazy();
 
             PostInstall();
 
@@ -207,3 +208,5 @@ namespace Zenject.Tests.Bindings
         }
     }
 }
+
+#endif
