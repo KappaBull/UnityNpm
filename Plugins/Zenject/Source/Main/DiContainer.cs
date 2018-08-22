@@ -156,7 +156,7 @@ namespace Zenject
 
         void InstallDefaultBindings()
         {
-            Bind<DiContainer>().FromInstance(this);
+            Bind(typeof(DiContainer), typeof(IInstantiator)).FromInstance(this);
             Bind(typeof(LazyInject<>)).FromMethodUntyped(CreateLazyBinding).Lazy();
         }
 
@@ -1003,7 +1003,7 @@ namespace Zenject
                     }
 
                     throw Assert.CreateException(
-                        "Provider returned zero instances when one was expected!  While resolving type '{0}'{1}. \nObject graph:\n{2}",
+                        "Unable to resolve type '{0}'{1}. \nObject graph:\n{2}",
                         memberType.ToString() + (context.Identifier == null
                             ? ""
                             : " with ID '{0}'".Fmt(context.Identifier.ToString())),
@@ -2483,7 +2483,8 @@ namespace Zenject
             }
         }
 
-        internal BindFinalizerWrapper StartBinding(string errorContext = null, bool flush = true)
+        // Don't use this method
+        public BindFinalizerWrapper StartBinding(string errorContext = null, bool flush = true)
         {
             Assert.That(!_isFinalizingBinding,
                 "Attempted to start a binding during a binding finalizer.  This is not allowed, since binding finalizers should directly use AddProvider instead, to allow for bindings to be inherited properly without duplicates");
@@ -2527,7 +2528,9 @@ namespace Zenject
             return Bind<TContract>(StartBinding());
         }
 
-        internal ConcreteIdBinderGeneric<TContract> BindNoFlush<TContract>()
+        // This is only useful for complex cases where you want to add multiple bindings
+        // at the same time and can be ignored by 99% of users
+        public ConcreteIdBinderGeneric<TContract> BindNoFlush<TContract>()
         {
             return Bind<TContract>(StartBinding(null, false));
         }
