@@ -1,10 +1,10 @@
 # UnityNpm - ExperimentalProject
- Automatically generate submodules that can be added to Unity's package manager.  
-YAMLの定義ファイルからUnityのPackageフォルダ対応のサブモジュール用ブランチを更新、作成します。  
-追加して欲しいリポジトリ等ありましたらプルリクして頂けると助かります。  
+Automatically generate submodules that can be added to Unity's package manager.  
+Update and create the sub module branch corresponding to the Unity Package folder from the YAML definition file.  
+If you have a repository etc. that you would like to add, it will be appreciated if you can pull request.  
   
-世界標準時0時又はマスターが更新された際に各ブランチを更新します。  
-更新用CIツール:[UnityNpmCI](https://github.com/KappaBull/UnityNpmCI)
+We update each branch at world standard time 0 o'clock or when master is updated.  
+Tools used for updating:[UnityNpmCI](https://github.com/KappaBull/UnityNpmCI)
 
 ## How to Use
 git submodule add -b {CheckRepositoryName}/{Version} https://github.com/KappaBull/UnityNpm.git package/{PackageName}  
@@ -12,7 +12,13 @@ git submodule add -b {CheckRepositoryName}/{Version} https://github.com/KappaBul
 Example: Import Zenject ver7.1.0  
 git submodule add -b Zenject/7.1.0 https://github.com/KappaBull/UnityNpm.git package/com.github.svermeulen.zenject  
 
-## CheckRepository
+## CheckRepository (MIT License Only)
+### Framework
 - [Zenject](https://github.com/svermeulen/Zenject)
-- [Graphy](https://github.com/Tayx94/graphy)
 - [UniRx](https://github.com/neuecc/UniRx.git)
+
+### Util
+- [Graphy](https://github.com/Tayx94/graphy)
+
+### Effect
+- [Pixel-Burn-Effect](https://github.com/Shealynntate/Pixel-Burn-Effect)
