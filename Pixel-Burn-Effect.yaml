@@ -5,11 +5,11 @@ package:
   description: "Pixel Burn shader effects made in Unity."
 license: /LICENSE
 copy:
-  - /UnityProject/Assets/Materials
-  - /UnityProject/Assets/Materials.meta
-  - /UnityProject/Assets/Scenes
-  - /UnityProject/Assets/Scenes.meta
-  - /UnityProject/Assets/Shaders
-  - /UnityProject/Assets/Shaders.meta
-  - /UnityProject/Assets/Textures
-  - /UnityProject/Assets/Textures.meta
+  - /Assets/Materials
+  - /Assets/Materials.meta
+  - /Assets/Scenes
+  - /Assets/Scenes.meta
+  - /Assets/Shaders
+  - /Assets/Shaders.meta
+  - /Assets/Textures
+  - /Assets/Textures.meta
