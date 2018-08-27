@@ -389,16 +389,8 @@ namespace UniRx
         Action<Exception> unhandledExceptionCallback = ex => Debug.LogException(ex); // default
 
         MicroCoroutine updateMicroCoroutine = null;
-        int updateCountForRefresh = 0;
-        const int UpdateRefreshCycle = 79;
-
         MicroCoroutine fixedUpdateMicroCoroutine = null;
-        int fixedUpdateCountForRefresh = 0;
-        const int FixedUpdateRefreshCycle = 73;
-
         MicroCoroutine endOfFrameMicroCoroutine = null;
-        int endOfFrameCountForRefresh = 0;
-        const int EndOfFrameRefreshCycle = 71;
 
         static MainThreadDispatcher instance;
         static bool initialized;
@@ -464,15 +456,13 @@ namespace UniRx
 
                 if (dispatcher == null)
                 {
-                    instance = new GameObject("MainThreadDispatcher").AddComponent<MainThreadDispatcher>();
+                    // awake call immediately from UnityEngine
+                    new GameObject("MainThreadDispatcher").AddComponent<MainThreadDispatcher>();
                 }
                 else
                 {
-                    instance = dispatcher;
+                    dispatcher.Awake(); // force awake
                 }
-                DontDestroyOnLoad(instance);
-                mainThreadToken = new object();
-                initialized = true;
             }
         }
 
@@ -484,104 +474,62 @@ namespace UniRx
                 mainThreadToken = new object();
                 initialized = true;
 
+                updateMicroCoroutine = new MicroCoroutine(ex => unhandledExceptionCallback(ex));
+                fixedUpdateMicroCoroutine = new MicroCoroutine(ex => unhandledExceptionCallback(ex));
+                endOfFrameMicroCoroutine = new MicroCoroutine(ex => unhandledExceptionCallback(ex));
+
                 StartCoroutine_Auto(RunUpdateMicroCoroutine());
                 StartCoroutine_Auto(RunFixedUpdateMicroCoroutine());
                 StartCoroutine_Auto(RunEndOfFrameMicroCoroutine());
 
-                // Added for consistency with Initialize()
                 DontDestroyOnLoad(gameObject);
             }
             else
             {
-                if (cullingMode == CullingMode.Self)
+                if (this != instance)
                 {
-                    Debug.LogWarning("There is already a MainThreadDispatcher in the scene. Removing myself...");
-                    // Destroy this dispatcher if there's already one in the scene.
-                    DestroyDispatcher(this);
-                }
-                else if (cullingMode == CullingMode.All)
-                {
-                    Debug.LogWarning("There is already a MainThreadDispatcher in the scene. Cleaning up all excess dispatchers...");
-                    CullAllExcessDispatchers();
-                }
-                else
-                {
-                    Debug.LogWarning("There is already a MainThreadDispatcher in the scene.");
+                    if (cullingMode == CullingMode.Self)
+                    {
+                        // Try to destroy this dispatcher if there's already one in the scene.
+                        Debug.LogWarning("There is already a MainThreadDispatcher in the scene. Removing myself...");
+                        DestroyDispatcher(this);
+                    }
+                    else if (cullingMode == CullingMode.All)
+                    {
+                        Debug.LogWarning("There is already a MainThreadDispatcher in the scene. Cleaning up all excess dispatchers...");
+                        CullAllExcessDispatchers();
+                    }
+                    else
+                    {
+                        Debug.LogWarning("There is already a MainThreadDispatcher in the scene.");
+                    }
                 }
             }
         }
 
         IEnumerator RunUpdateMicroCoroutine()
         {
-            this.updateMicroCoroutine = new MicroCoroutine(
-                () =>
-                {
-                    if (updateCountForRefresh > UpdateRefreshCycle)
-                    {
-                        updateCountForRefresh = 0;
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                },
-                ex => unhandledExceptionCallback(ex));
-
             while (true)
             {
                 yield return null;
-                updateCountForRefresh++;
                 updateMicroCoroutine.Run();
             }
         }
 
         IEnumerator RunFixedUpdateMicroCoroutine()
         {
-            this.fixedUpdateMicroCoroutine = new MicroCoroutine(
-                () =>
-                {
-                    if (fixedUpdateCountForRefresh > FixedUpdateRefreshCycle)
-                    {
-                        fixedUpdateCountForRefresh = 0;
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }, 
-                ex => unhandledExceptionCallback(ex));
-
             while (true)
             {
                 yield return YieldInstructionCache.WaitForFixedUpdate;
-                fixedUpdateCountForRefresh++;
                 fixedUpdateMicroCoroutine.Run();
             }
         }
 
         IEnumerator RunEndOfFrameMicroCoroutine()
         {
-            this.endOfFrameMicroCoroutine = new MicroCoroutine(
-                () =>
-                {
-                    if (endOfFrameCountForRefresh > EndOfFrameRefreshCycle)
-                    {
-                        endOfFrameCountForRefresh = 0;
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }, 
-                ex => unhandledExceptionCallback(ex));
-
             while (true)
             {
                 yield return YieldInstructionCache.WaitForEndOfFrame;
-                endOfFrameCountForRefresh++;
                 endOfFrameMicroCoroutine.Run();
             }
         }
