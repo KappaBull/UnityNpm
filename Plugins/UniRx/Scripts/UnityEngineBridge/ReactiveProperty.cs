@@ -4,6 +4,9 @@ using System.Threading;
 #if !UniRxLibrary
 using UnityEngine;
 #endif
+#if CSHARP_7_OR_LATER
+using UniRx.Async;
+#endif
 
 namespace UniRx
 {
@@ -11,6 +14,10 @@ namespace UniRx
     {
         T Value { get; }
         bool HasValue { get; }
+
+#if (CSHARP_7_OR_LATER)
+        UniTask<T> WaitUntilValueChangedAsync();
+#endif
     }
 
     public interface IReactiveProperty<T> : IReadOnlyReactiveProperty<T>
@@ -108,7 +115,8 @@ namespace UniRx
                 if (!EqualityComparer.Equals(this.value, value))
                 {
                     SetValue(value);
-                    if (isDisposed) return;
+                    if (isDisposed)
+                        return;
 
                     RaiseOnNext(ref value);
                 }
@@ -143,6 +151,10 @@ namespace UniRx
                 node.OnNext(value);
                 node = node.Next;
             }
+
+#if (CSHARP_7_OR_LATER)
+            promise?.InvokeContinuation(ref value);
+#endif
         }
 
         protected virtual void SetValue(T value)
@@ -153,7 +165,8 @@ namespace UniRx
         public void SetValueAndForceNotify(T value)
         {
             SetValue(value);
-            if (isDisposed) return;
+            if (isDisposed)
+                return;
 
             RaiseOnNext(ref value);
         }
@@ -235,6 +248,20 @@ namespace UniRx
         {
             return false;
         }
+
+
+#if (CSHARP_7_OR_LATER)
+
+        ReactivePropertyReusablePromise<T> promise;
+
+        public UniTask<T> WaitUntilValueChangedAsync()
+        {
+            if (promise != null) return promise.Task;
+            promise = new ReactivePropertyReusablePromise<T>();
+            return promise.Task;
+        }
+
+#endif
     }
 
     /// <summary>
@@ -369,6 +396,7 @@ namespace UniRx
         protected virtual void Dispose(bool disposing)
         {
             if (isDisposed) return;
+            sourceConnection.Dispose();
 
             var node = root;
             root = last = null;
@@ -426,6 +454,10 @@ namespace UniRx
                 node.OnNext(value);
                 node = node.Next;
             }
+
+#if (CSHARP_7_OR_LATER)
+            promise?.InvokeContinuation(ref value);
+#endif
         }
 
         void IObserver<T>.OnError(Exception error)
@@ -458,6 +490,19 @@ namespace UniRx
         {
             return false;
         }
+
+#if (CSHARP_7_OR_LATER)
+
+        ReactivePropertyReusablePromise<T> promise;
+
+        public UniTask<T> WaitUntilValueChangedAsync()
+        {
+            if (promise != null) return promise.Task;
+            promise = new ReactivePropertyReusablePromise<T>();
+            return promise.Task;
+        }
+
+#endif
     }
 
     /// <summary>
@@ -479,6 +524,16 @@ namespace UniRx
         {
             return new ReadOnlyReactiveProperty<T>(source);
         }
+
+#if (CSHARP_7_OR_LATER)
+
+        public static UniTask<T>.Awaiter GetAwaiter<T>(this IReadOnlyReactiveProperty<T> source)
+        {
+            return source.WaitUntilValueChangedAsync().GetAwaiter();
+        }
+
+#endif
+
 
         /// <summary>
         /// Create ReadOnlyReactiveProperty with distinctUntilChanged: false.
@@ -517,7 +572,8 @@ namespace UniRx
             {
                 foreach (var item in xs)
                 {
-                    if (item == false) return false;
+                    if (item == false)
+                        return false;
                 }
                 return true;
             });
@@ -533,7 +589,8 @@ namespace UniRx
             {
                 foreach (var item in xs)
                 {
-                    if (item == true) return false;
+                    if (item == true)
+                        return false;
                 }
                 return true;
             });

@@ -3,6 +3,7 @@
 
 using System;
 using System.Threading;
+using UniRx.Async.Internal;
 using UnityEngine;
 
 namespace UniRx.Async
@@ -11,86 +12,136 @@ namespace UniRx.Async
     {
         public static UniTask Yield(PlayerLoopTiming timing = PlayerLoopTiming.Update, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var source = new YieldPromise(cancellationToken);
-            PlayerLoopHelper.AddAction(timing, source);
-            return source.Task;
+            return new UniTask(new YieldPromise(timing, cancellationToken));
         }
 
-        public static UniTask<int> Delay(int delayFrameCount, PlayerLoopTiming delayTiming = PlayerLoopTiming.Update, CancellationToken cancellationToken = default(CancellationToken))
+        public static UniTask Delay(int millisecondsDelay, bool ignoreTimeScale = false, PlayerLoopTiming delayTiming = PlayerLoopTiming.Update, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (delayFrameCount < 0)
-            {
-                throw new ArgumentOutOfRangeException("Delay does not allow minus delayFrameCount. delayFrameCount:" + delayFrameCount);
-            }
-
-            var source = new DelayPromise(delayFrameCount, cancellationToken);
-            PlayerLoopHelper.AddAction(delayTiming, source);
-            return source.Task;
+            return Delay(TimeSpan.FromMilliseconds(millisecondsDelay), ignoreTimeScale, delayTiming, cancellationToken);
         }
 
-        public static UniTask Delay(TimeSpan delayTimeSpan, PlayerLoopTiming delayTiming = PlayerLoopTiming.Update, CancellationToken cancellationToken = default(CancellationToken))
+        public static UniTask Delay(TimeSpan delayTimeSpan, bool ignoreTimeScale = false, PlayerLoopTiming delayTiming = PlayerLoopTiming.Update, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (delayTimeSpan < TimeSpan.Zero)
             {
                 throw new ArgumentOutOfRangeException("Delay does not allow minus delayFrameCount. delayTimeSpan:" + delayTimeSpan);
             }
 
-            var source = new DelayTimeSpanPromise(delayTimeSpan, cancellationToken);
-            PlayerLoopHelper.AddAction(delayTiming, source);
+            if (ignoreTimeScale)
+            {
+                var source = new DelayIgnoreTimeScalePromise(delayTimeSpan, delayTiming, cancellationToken);
+                return source.Task;
+            }
+            else
+            {
+                var source = new DelayPromise(delayTimeSpan, delayTiming, cancellationToken);
+                return source.Task;
+            }
+        }
+
+        public static UniTask<int> DelayFrame(int delayFrameCount, PlayerLoopTiming delayTiming = PlayerLoopTiming.Update, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (delayFrameCount < 0)
+            {
+                throw new ArgumentOutOfRangeException("Delay does not allow minus delayFrameCount. delayFrameCount:" + delayFrameCount);
+            }
+
+            var source = new DelayFramePromise(delayFrameCount, delayTiming, cancellationToken);
             return source.Task;
         }
 
-        class YieldPromise : Promise<AsyncUnit>, IPlayerLoopItem
+        class YieldPromise : ReusablePromise, IPlayerLoopItem
         {
+            readonly PlayerLoopTiming timing;
             CancellationToken cancellation;
+            bool isRunning = false;
 
-            public UniTask Task => new UniTask(this);
-
-            public YieldPromise(CancellationToken cancellation)
+            public YieldPromise(PlayerLoopTiming timing, CancellationToken cancellation)
             {
+                this.timing = timing;
                 this.cancellation = cancellation;
+            }
+
+            public override bool IsCompleted
+            {
+                get
+                {
+                    if (cancellation.IsCancellationRequested) return true;
+
+                    if (!isRunning)
+                    {
+                        isRunning = true;
+                        PlayerLoopHelper.AddAction(timing, this);
+                    }
+                    return false;
+                }
+            }
+
+            public override void GetResult()
+            {
+                cancellation.ThrowIfCancellationRequested();
             }
 
             public bool MoveNext()
             {
-                if (cancellation.IsCancellationRequested)
-                {
-                    SetCanceled();
-                    return false;
-                }
-
-                SetResult(AsyncUnit.Default);
+                isRunning = false;
+                TryInvokeContinuation();
                 return false;
             }
         }
 
-        class DelayPromise : Promise<int>, IPlayerLoopItem
+        class DelayFramePromise : ReusablePromise<int>, IPlayerLoopItem
         {
             readonly int delayFrameCount;
+            readonly PlayerLoopTiming timing;
             CancellationToken cancellation;
 
+            bool isRunning = false;
             int currentFrameCount;
 
-            public UniTask<int> Task => new UniTask<int>(this);
-
-            public DelayPromise(int delayFrameCount, CancellationToken cancellation)
+            public DelayFramePromise(int delayFrameCount, PlayerLoopTiming timing, CancellationToken cancellation)
             {
                 this.delayFrameCount = delayFrameCount;
                 this.cancellation = cancellation;
+                this.timing = timing;
                 this.currentFrameCount = 0;
+            }
+
+            public override bool IsCompleted
+            {
+                get
+                {
+                    if (cancellation.IsCancellationRequested) return true;
+
+                    if (!isRunning)
+                    {
+                        isRunning = true;
+                        currentFrameCount = 0;
+                        PlayerLoopHelper.AddAction(timing, this);
+                    }
+                    return false;
+                }
+            }
+
+            public override int GetResult()
+            {
+                cancellation.ThrowIfCancellationRequested();
+                return base.GetResult();
             }
 
             public bool MoveNext()
             {
                 if (cancellation.IsCancellationRequested)
                 {
-                    SetCanceled();
+                    isRunning = false;
+                    TryInvokeContinuation(default(int));
                     return false;
                 }
 
                 if (currentFrameCount == delayFrameCount)
                 {
-                    SetResult(currentFrameCount);
+                    isRunning = false;
+                    TryInvokeContinuation(currentFrameCount);
                     return false;
                 }
 
@@ -99,35 +150,116 @@ namespace UniRx.Async
             }
         }
 
-        class DelayTimeSpanPromise : Promise<AsyncUnit>, IPlayerLoopItem
+        class DelayPromise : ReusablePromise, IPlayerLoopItem
         {
-            readonly double delayFrameTimeSpan;
+            readonly float delayFrameTimeSpan;
+            readonly PlayerLoopTiming timing;
+            float elapsed;
             CancellationToken cancellation;
+            bool isRunning = false;
 
-            float initialTime;
-
-            public UniTask Task => new UniTask(this);
-
-            public DelayTimeSpanPromise(TimeSpan delayFrameTimeSpan, CancellationToken cancellation)
+            public DelayPromise(TimeSpan delayFrameTimeSpan, PlayerLoopTiming timing, CancellationToken cancellation)
             {
-                this.delayFrameTimeSpan = delayFrameTimeSpan.TotalSeconds;
+                this.delayFrameTimeSpan = (float)delayFrameTimeSpan.TotalSeconds;
+                this.timing = timing;
                 this.cancellation = cancellation;
-                this.initialTime = Time.realtimeSinceStartup;
+                this.elapsed = 0.0f;
+            }
+
+            public override bool IsCompleted
+            {
+                get
+                {
+                    if (cancellation.IsCancellationRequested) return true;
+
+                    if (!isRunning)
+                    {
+                        isRunning = true;
+                        this.elapsed = 0.0f;
+                        PlayerLoopHelper.AddAction(timing, this);
+                    }
+                    return false;
+                }
+            }
+
+            public override void GetResult()
+            {
+                cancellation.ThrowIfCancellationRequested();
             }
 
             public bool MoveNext()
             {
                 if (cancellation.IsCancellationRequested)
                 {
-                    SetCanceled();
+                    isRunning = false;
+                    TryInvokeContinuation();
                     return false;
                 }
 
-                var diff = Time.realtimeSinceStartup - initialTime;
-
-                if (diff >= delayFrameTimeSpan)
+                elapsed += Time.deltaTime;
+                if (elapsed >= delayFrameTimeSpan)
                 {
-                    SetResult(default(AsyncUnit));
+                    isRunning = false;
+                    TryInvokeContinuation();
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
+        class DelayIgnoreTimeScalePromise : ReusablePromise, IPlayerLoopItem
+        {
+            readonly float delayFrameTimeSpan;
+            readonly PlayerLoopTiming timing;
+            float elapsed;
+            CancellationToken cancellation;
+            bool isRunning = false;
+
+            public DelayIgnoreTimeScalePromise(TimeSpan delayFrameTimeSpan, PlayerLoopTiming timing, CancellationToken cancellation)
+            {
+                this.delayFrameTimeSpan = (float)delayFrameTimeSpan.TotalSeconds;
+                this.timing = timing;
+                this.cancellation = cancellation;
+                this.elapsed = 0.0f;
+            }
+
+            public override bool IsCompleted
+            {
+                get
+                {
+                    if (cancellation.IsCancellationRequested) return true;
+
+                    if (!isRunning)
+                    {
+                        isRunning = true;
+                        this.elapsed = 0.0f;
+                        PlayerLoopHelper.AddAction(timing, this);
+                    }
+                    return false;
+                }
+            }
+
+            public override void GetResult()
+            {
+                cancellation.ThrowIfCancellationRequested();
+            }
+
+            public bool MoveNext()
+            {
+                if (cancellation.IsCancellationRequested)
+                {
+                    isRunning = false;
+                    TryInvokeContinuation();
+                    return false;
+                }
+
+                elapsed += Time.unscaledDeltaTime;
+
+                if (elapsed >= delayFrameTimeSpan)
+                {
+                    isRunning = false;
+                    TryInvokeContinuation();
                     return false;
                 }
 

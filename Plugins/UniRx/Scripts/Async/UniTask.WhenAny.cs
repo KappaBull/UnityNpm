@@ -10,6 +10,8 @@ namespace UniRx.Async
 {
     public partial struct UniTask
     {
+        // UniTask
+
         public static async UniTask<(bool hasResultLeft, T0 result)> WhenAny<T0>(UniTask<T0> task0, UniTask task1)
         {
             return await new UnitWhenAnyPromise<T0>(task0, task1);
@@ -365,7 +367,6 @@ namespace UniRx.Async
                 }
             }
         }
-
     }
 }
 

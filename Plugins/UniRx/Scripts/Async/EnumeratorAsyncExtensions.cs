@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections;
-using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Threading;
 
@@ -11,19 +10,24 @@ namespace UniRx.Async
 {
     public static class EnumeratorAsyncExtensions
     {
-        public static EnumeratorAwaiter GetAwaiter(this IEnumerator enumerator)
+        public static UniTask.Awaiter GetAwaiter(this IEnumerator enumerator)
+        {
+            return enumerator.ConfigureAwait().GetAwaiter();
+        }
+
+        public static UniTask ToUniTask(this IEnumerator enumerator)
         {
             return enumerator.ConfigureAwait();
         }
 
-        public static EnumeratorAwaiter ConfigureAwait(this IEnumerator enumerator, PlayerLoopTiming timing = PlayerLoopTiming.Update, CancellationToken cancellationToken = default(CancellationToken))
+        public static UniTask ConfigureAwait(this IEnumerator enumerator, PlayerLoopTiming timing = PlayerLoopTiming.Update, CancellationToken cancellationToken = default(CancellationToken))
         {
             var awaiter = new EnumeratorAwaiter(enumerator, cancellationToken);
             PlayerLoopHelper.AddAction(timing, awaiter);
-            return awaiter;
+            return new UniTask(awaiter);
         }
 
-        public class EnumeratorAwaiter : ICriticalNotifyCompletion, IPlayerLoopItem
+        class EnumeratorAwaiter : IAwaiter, IPlayerLoopItem
         {
             const int Unfinished = 0;
             const int Success = 1;
@@ -44,21 +48,18 @@ namespace UniRx.Async
                 this.cancellationToken = cancellationToken;
             }
 
-            public EnumeratorAwaiter GetAwaiter()
-            {
-                return this;
-            }
-
             public bool IsCompleted
             {
                 get
                 {
-                    return completeState != Unfinished;
+                    return cancellationToken.IsCancellationRequested || (completeState != Unfinished);
                 }
             }
 
             public void GetResult()
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 if (completeState == Success)
                 {
                     return;

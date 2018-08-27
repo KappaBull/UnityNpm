@@ -12,6 +12,8 @@ namespace UniRx.Async
 {
     public partial struct UniTask
     {
+        // UniTask
+
         public static async UniTask<T[]> WhenAll<T>(params UniTask<T>[] tasks)
         {
             return await new WhenAllPromise<T>(tasks);
