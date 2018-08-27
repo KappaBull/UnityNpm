@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -223,7 +225,7 @@ namespace Zenject.Tests.Factories
 
         void AddFactoryUser<TValue, TFactory>()
             where TValue : IFoo
-            where TFactory : Factory<double, int, float, string, char, TValue>
+            where TFactory : PlaceholderFactory<double, int, float, string, char, TValue>
         {
             Container.Bind<IInitializable>()
                 .To<FooFactoryTester<TValue, TFactory>>().AsSingle();
@@ -232,7 +234,7 @@ namespace Zenject.Tests.Factories
         }
 
         public class FooFactoryTester<TValue, TFactory> : IInitializable
-            where TFactory : Factory<double, int, float, string, char, TValue>
+            where TFactory : PlaceholderFactory<double, int, float, string, char, TValue>
             where TValue : IFoo
         {
             readonly TFactory _factory;
@@ -251,3 +253,5 @@ namespace Zenject.Tests.Factories
         }
     }
 }
+
+#endif

@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+
+using System;
 using UnityEngine.TestTools;
 using System.Collections;
 using System.Collections.Generic;
@@ -60,44 +62,11 @@ namespace Zenject.Tests.Bindings
         public IEnumerator TestSingle()
         {
             PreInstall();
-            Container.Bind<IFoo>().To<Foo>().FromComponentInNewPrefab(FooPrefab).AsSingle().NonLazy();
-            Container.Bind<Foo>().FromComponentInNewPrefab(FooPrefab).AsSingle().NonLazy();
+            Container.Bind(typeof(IFoo), typeof(Foo)).To<Foo>().FromComponentInNewPrefab(FooPrefab).AsSingle().NonLazy();
 
             PostInstall();
 
             FixtureUtil.AssertComponentCount<Foo>(1);
-            yield break;
-        }
-
-        [UnityTest]
-        public IEnumerator TestSingle2()
-        {
-            PreInstall();
-            // For ToPrefab, the 'AsSingle' applies to the prefab and not the type, so this is valid
-            Container.Bind<IFoo>().To<Foo>().FromComponentInNewPrefab(FooPrefab).AsSingle().NonLazy();
-            Container.Bind<Foo>().FromComponentInNewPrefab(FooPrefab2).AsSingle().NonLazy();
-            Container.Bind<Foo>().FromMethod(ctx => ctx.Container.CreateEmptyGameObject("Foo").AddComponent<Foo>()).NonLazy();
-
-            PostInstall();
-
-            FixtureUtil.AssertComponentCount<Foo>(3);
-            FixtureUtil.AssertNumGameObjects(3);
-            yield break;
-        }
-
-        [UnityTest]
-        public IEnumerator TestSingleIdentifiers()
-        {
-            PreInstall();
-            Container.Bind<Foo>().FromComponentInNewPrefab(FooPrefab).WithGameObjectName("Foo").AsSingle().NonLazy();
-            Container.Bind<Bar>().FromComponentInNewPrefab(FooPrefab).WithGameObjectName("Foo").AsSingle().NonLazy();
-
-            PostInstall();
-
-            FixtureUtil.AssertNumGameObjects(1);
-            FixtureUtil.AssertComponentCount<Foo>(1);
-            FixtureUtil.AssertComponentCount<Bar>(1);
-            FixtureUtil.AssertNumGameObjectsWithName("Foo", 1);
             yield break;
         }
 
@@ -106,7 +75,7 @@ namespace Zenject.Tests.Bindings
         {
             PreInstall();
             Container.Bind(typeof(Foo), typeof(Bar)).FromComponentInNewPrefab(FooPrefab)
-                .WithGameObjectName("Foo").AsCached().NonLazy();
+                .WithGameObjectName("Foo").AsSingle().NonLazy();
 
             PostInstall();
 
@@ -122,7 +91,7 @@ namespace Zenject.Tests.Bindings
         {
             PreInstall();
             // They have required arguments
-            Container.Bind(typeof(Gorp), typeof(Qux)).FromComponentInNewPrefab(GorpAndQuxPrefab).AsCached().NonLazy();
+            Container.Bind(typeof(Gorp), typeof(Qux)).FromComponentInNewPrefab(GorpAndQuxPrefab).AsSingle().NonLazy();
 
             Assert.Throws(() => PostInstall());
             yield break;
@@ -133,7 +102,7 @@ namespace Zenject.Tests.Bindings
         {
             PreInstall();
             Container.Bind(typeof(Gorp), typeof(Qux))
-                .FromComponentInNewPrefab(GorpAndQuxPrefab).WithGameObjectName("Gorp").AsCached()
+                .FromComponentInNewPrefab(GorpAndQuxPrefab).WithGameObjectName("Gorp").AsSingle()
                 .WithArguments(5, "test1").NonLazy();
 
             Assert.Throws(() => PostInstall());
@@ -145,7 +114,7 @@ namespace Zenject.Tests.Bindings
         {
             PreInstall();
             Container.Bind<Gorp>().FromComponentInNewPrefab(GorpPrefab)
-                .WithGameObjectName("Gorp").AsCached()
+                .WithGameObjectName("Gorp").AsSingle()
                 .WithArguments("test1").NonLazy();
 
             PostInstall();
@@ -191,7 +160,7 @@ namespace Zenject.Tests.Bindings
         {
             PreInstall();
             // Jim and Bob both depend on each other
-            Container.Bind(typeof(Jim), typeof(Bob)).FromComponentInNewPrefab(JimAndBobPrefab).AsCached().NonLazy();
+            Container.Bind(typeof(Jim), typeof(Bob)).FromComponentInNewPrefab(JimAndBobPrefab).AsSingle().NonLazy();
             Container.BindInterfacesTo<JimAndBobRunner>().AsSingle().NonLazy();
 
             PostInstall();
@@ -224,3 +193,5 @@ namespace Zenject.Tests.Bindings
         }
     }
 }
+
+#endif

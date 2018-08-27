@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -50,9 +52,11 @@ namespace Zenject.Tests
 
             PostInstall();
 
+            yield return null;
+
             Assert.That(Foo.WasInitialized);
 
-            DestroyAll();
+            yield return DestroyEverything();
 
             Assert.That(Foo.WasDisposed);
             yield break;
@@ -70,10 +74,13 @@ namespace Zenject.Tests
         {
             Assert.That(!ProjectContext.HasInstance);
             SkipInstall();
+            yield return null;
             Assert.That(ProjectContext.HasInstance);
-            DestroyAll();
+            yield return DestroyEverything();
             Assert.That(!ProjectContext.HasInstance);
             yield break;
         }
     }
 }
+
+#endif

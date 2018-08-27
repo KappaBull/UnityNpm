@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using System;
 using UnityEngine.TestTools;
 using System.Collections;
@@ -52,8 +54,7 @@ namespace Zenject.Tests.Bindings
             PreInstall();
             Foo.InstanceCount = 0;
 
-            Container.Bind<IFoo>().To<Foo>().FromNewScriptableObjectResource(PathPrefix + "Foo").AsSingle();
-            Container.Bind<Foo>().FromNewScriptableObjectResource(PathPrefix + "Foo").AsSingle();
+            Container.Bind(typeof(IFoo), typeof(Foo)).To<Foo>().FromNewScriptableObjectResource(PathPrefix + "Foo").AsSingle();
 
             PostInstall();
 
@@ -83,7 +84,7 @@ namespace Zenject.Tests.Bindings
         {
             PreInstall();
             Container.Bind<Bob>()
-                .FromNewScriptableObjectResource(PathPrefix + "Bob").AsCached().NonLazy();
+                .FromNewScriptableObjectResource(PathPrefix + "Bob").AsSingle().NonLazy();
 
             Assert.Throws(() => PostInstall());
             yield break;
@@ -94,7 +95,7 @@ namespace Zenject.Tests.Bindings
         {
             PreInstall();
             Container.Bind<Bob>()
-                .FromNewScriptableObjectResource(PathPrefix + "Bob").AsCached()
+                .FromNewScriptableObjectResource(PathPrefix + "Bob").AsSingle()
                 .WithArguments("test1").NonLazy();
 
             PostInstall();
@@ -104,3 +105,5 @@ namespace Zenject.Tests.Bindings
         }
     }
 }
+
+#endif
