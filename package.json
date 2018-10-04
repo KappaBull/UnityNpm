@@ -1,1 +1,1 @@
-{"name":"com.github.svermeulen.zenject","displayName":"Zenject","version":"7.2.0","unity":"2018.1","description":"Dependency Injection Framework for Unity3D","dependencis":{}}
+{"name":"com.github.googlesamples.unity-jar-resolver","displayName":"unity-jar-resolver","version":"1.2.0","unity":"2018.1","description":"Unity plugin which resolves Android \u0026 iOS dependencies and performs version management","dependencis":{}}
