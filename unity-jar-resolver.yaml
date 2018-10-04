@@ -1,0 +1,8 @@
+repository: https://github.com/googlesamples/unity-jar-resolver.git
+check: tag
+package:
+  name: com.github.googlesamples.unity-jar-resolver
+  description: "Unity plugin which resolves Android & iOS dependencies and performs version management"
+license: /LICENSE
+copy:
+  - /plugin/Assets/PlayServicesResolver

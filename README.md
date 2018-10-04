@@ -22,3 +22,6 @@ git submodule add -b Zenject/7.1.0 https://github.com/KappaBull/UnityNpm.git pac
 
 ### Effect
 - [Pixel-Burn-Effect](https://github.com/Shealynntate/Pixel-Burn-Effect)
+
+### Editor
+- [unity-jar-resolver](https://github.com/googlesamples/unity-jar-resolver)
