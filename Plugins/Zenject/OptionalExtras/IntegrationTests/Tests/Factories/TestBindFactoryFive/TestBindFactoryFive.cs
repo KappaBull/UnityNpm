@@ -1,14 +1,9 @@
 ﻿#if UNITY_EDITOR
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using NUnit.Framework;
-using UnityEngine;
 using ModestTree;
+using UnityEngine;
 using UnityEngine.TestTools;
-using Assert=ModestTree.Assert;
 using Zenject.Tests.Factories.BindFactoryFive;
 
 namespace Zenject.Tests.Factories
@@ -196,7 +191,7 @@ namespace Zenject.Tests.Factories
         public IEnumerator TestToSubContainerPrefabResourceSelf()
         {
             PreInstall();
-            Container.BindFactory<double, int, float, string, char, Foo, Foo.Factory>().FromSubContainerResolve().ByNewPrefabResource<FooInstaller>("TestBindFactoryFive/FooSubContainer");
+            Container.BindFactory<double, int, float, string, char, Foo, Foo.Factory>().FromSubContainerResolve().ByNewContextPrefabResource<FooInstaller>("TestBindFactoryFive/FooSubContainer");
 
             AddFactoryUser<Foo, Foo.Factory>();
 
@@ -212,7 +207,7 @@ namespace Zenject.Tests.Factories
         {
             PreInstall();
             Container.BindFactory<double, int, float, string, char, IFoo, IFooFactory>()
-                .To<Foo>().FromSubContainerResolve().ByNewPrefabResource<FooInstaller>("TestBindFactoryFive/FooSubContainer");
+                .To<Foo>().FromSubContainerResolve().ByNewContextPrefabResource<FooInstaller>("TestBindFactoryFive/FooSubContainer");
 
             AddFactoryUser<IFoo, IFooFactory>();
 
@@ -248,7 +243,7 @@ namespace Zenject.Tests.Factories
             {
                 Assert.IsEqual(_factory.Create(0.15, 0, 2.4f, "zxcv", 'z').Value, "zxcv");
 
-                ModestTree.Log.Info("Factory created foo successfully");
+                Log.Info("Factory created foo successfully");
             }
         }
     }
