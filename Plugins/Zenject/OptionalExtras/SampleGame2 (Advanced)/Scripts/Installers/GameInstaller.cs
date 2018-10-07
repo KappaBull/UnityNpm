@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using ModestTree.Util;
 using UnityEngine;
-using Zenject;
 
 namespace Zenject.SpaceFighter
 {
@@ -11,7 +7,7 @@ namespace Zenject.SpaceFighter
     public class GameInstaller : MonoInstaller
     {
         [Inject]
-        Settings _settings = null;
+        Settings _settings;
 
         public override void InstallBindings()
         {

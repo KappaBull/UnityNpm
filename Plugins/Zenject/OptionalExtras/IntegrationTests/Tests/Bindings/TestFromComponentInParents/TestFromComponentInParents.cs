@@ -1,14 +1,10 @@
 #if UNITY_EDITOR
 
-using System;
-using UnityEngine.TestTools;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using NUnit.Framework;
-using UnityEngine;
 using ModestTree;
-using Assert=ModestTree.Assert;
+using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace Zenject.Tests.Bindings
 {
@@ -118,6 +114,87 @@ namespace Zenject.Tests.Bindings
             PreInstall();
 
             Container.Bind<Root>().FromComponentInParents();
+
+            PostInstall();
+
+            Assert.IsNull(child.Root);
+            yield break;
+        }
+
+        [UnityTest]
+        public IEnumerator RunMatchSingleParentNonGeneric()
+        {
+            Setup1();
+            PreInstall();
+            Container.Bind(typeof(Root)).FromComponentInParents();
+            Container.Bind(typeof(Child)).FromComponentInParents();
+
+            PostInstall();
+
+            Assert.IsEqual(_grandchild.Childs.Count, 1);
+            Assert.IsEqual(_grandchild.Childs[0], _child2);
+            Assert.IsEqual(_grandchild.Root, _root);
+            yield break;
+        }
+
+        [UnityTest]
+        public IEnumerator RunMatchMultipleParentsNonGeneric()
+        {
+            Setup1();
+            PreInstall();
+            Container.Bind(typeof(Root)).FromComponentInParents();
+            Container.Bind(typeof(Child)).FromComponentsInParents();
+
+            PostInstall();
+
+            Assert.IsEqual(_grandchild.Childs.Count, 3);
+            Assert.IsEqual(_grandchild.Childs[0], _child2);
+            Assert.IsEqual(_grandchild.Childs[1], _child3);
+            Assert.IsEqual(_grandchild.Childs[2], _child1);
+            Assert.IsEqual(_grandchild.Root, _root);
+            yield break;
+        }
+
+        [UnityTest]
+        public IEnumerator RunMissingParentFailureNonGeneric()
+        {
+            var root = new GameObject().AddComponent<Root>();
+
+            var grandchild = new GameObject().AddComponent<Grandchild2>();
+            grandchild.transform.SetParent(root.transform);
+
+            PreInstall();
+            Container.Bind(typeof(Root)).FromComponentInParents();
+            Container.Bind(typeof(Child)).FromComponentInParents();
+
+            Assert.Throws(() => PostInstall());
+            yield break;
+        }
+
+        [UnityTest]
+        public IEnumerator RunMissingParentSuccessNonGeneric()
+        {
+            Setup2();
+            PreInstall();
+            Container.Bind(typeof(Root)).FromComponentInParents();
+            Container.Bind(typeof(Child)).FromComponentsInParents();
+
+            PostInstall();
+
+            Assert.IsEqual(_grandchild.Childs.Count, 0);
+            Assert.IsEqual(_grandchild.Root, _root);
+            yield break;
+        }
+
+        [UnityTest]
+        public IEnumerator TestOptionalNonGeneric()
+        {
+            new GameObject();
+            var child = new GameObject().AddComponent<ChildWithOptional>();
+
+            PreInstall();
+
+            Container.Bind(typeof(Root)).FromComponentInParents();
 
             PostInstall();
 
