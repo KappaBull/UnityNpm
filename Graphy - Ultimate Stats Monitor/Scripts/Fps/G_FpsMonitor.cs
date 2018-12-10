@@ -1,60 +1,70 @@
 ﻿/* ---------------------------------------
- * Author: Martin Pane (martintayx@gmail.com) (@tayx94)
- * Project: Graphy - Ultimate Stats Monitor
- * Date: 15-Dec-17
- * Studio: Tayx
+ * Author:          Martin Pane (martintayx@gmail.com) (@tayx94)
+ * Collaborators:   Lars Aalbertsen (@Rockylars)
+ * Project:         Graphy - Ultimate Stats Monitor
+ * Date:            15-Dec-17
+ * Studio:          Tayx
+ * 
  * This project is released under the MIT license.
  * Attribution is not required, but it is always welcomed!
  * -------------------------------------*/
 
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Tayx.Graphy.Fps
 {
-    public class FpsMonitor : MonoBehaviour
+    public class G_FpsMonitor : MonoBehaviour
     {
+        /* ----- TODO: ----------------------------
+         * Add summaries to the variables.
+         * Add summaries to the functions.
+         * --------------------------------------*/
 
-        #region Private Variables
+        #region Variables -> Serialized Private
+
+        [SerializeField] private    int             m_averageSamples            = 200;
+
+        #endregion
+
+        #region Variables -> Private
 
         private GraphyManager m_graphyManager;
 
-        private float m_currentFps                          = 0;
-        private float m_avgFps                              = 0;
-        private float m_minFps                              = 0;
-        private float m_maxFps                              = 0;
+        private                     float           m_currentFps                = 0f;
+        private                     float           m_avgFps                    = 0f;
+        private                     float           m_minFps                    = 0f;
+        private                     float           m_maxFps                    = 0f;
 
-        [SerializeField] private int m_averageSamples       = 200;
+        private                     List<float>     m_averageFpsSamples;
 
-        private List<float> m_averageFpsSamples;
+        private                     int             m_timeToResetMinMaxFps      = 10;
 
-        private int m_timeToResetMinMaxFps = 10;
+        private                     float           m_timeToResetMinFpsPassed   = 0f;
+        private                     float           m_timeToResetMaxFpsPassed   = 0f;
 
-        private float m_timeToResetMinFpsPassed             = 0;
-        private float m_timeToResetMaxFpsPassed             = 0;
-
-        private float unscaledDeltaTime                     = 0;
+        private                     float           unscaledDeltaTime           = 0f;
 
         #endregion
 
-        #region Properties
+        #region Properties -> Public
 
-        public float CurrentFPS         { get { return m_currentFps;            } }
-        public float AverageFPS         { get { return m_avgFps;                } }
-        public float MinFPS             { get { return m_minFps;                } }
-        public float MaxFPS             { get { return m_maxFps;                } }
+        public                      float           CurrentFPS  { get { return m_currentFps; } }
+        public                      float           AverageFPS  { get { return m_avgFps;} }
+
+        public                      float           MinFPS      { get { return m_minFps;} }
+        public                      float           MaxFPS      { get { return m_maxFps;} }
         
         #endregion
 
-        #region Unity Methods
+        #region Methods -> Unity Callbacks
 
-        void Awake()
+        private void Awake()
         {
             Init();
         }
 
-        void Update()
+        private void Update()
         {
             unscaledDeltaTime = Time.unscaledDeltaTime;
 
@@ -123,7 +133,7 @@ namespace Tayx.Graphy.Fps
 
         #endregion
 
-        #region Public Methods
+        #region Methods -> Public
 
         public void UpdateParameters()
         {
@@ -132,7 +142,7 @@ namespace Tayx.Graphy.Fps
 
         #endregion
 
-        #region Private Methods
+        #region Methods -> Private
 
         private void Init()
         {
@@ -144,6 +154,5 @@ namespace Tayx.Graphy.Fps
         }
 
         #endregion
-
     }
 }
