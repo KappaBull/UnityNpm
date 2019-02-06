@@ -300,7 +300,6 @@ MonoBehaviour:
   _autoRun: 1
   _parentNewObjectsUnderRoot: 0
   _contractNames: []
-  _parentContractName: 
   _parentContractNames: []
 --- !u!114 &805392157
 MonoBehaviour:
@@ -573,6 +572,7 @@ MonoBehaviour:
   _components:
   - {fileID: 1194014233}
   _identifier: 
+  _useSceneContext: 0
   _context: {fileID: 0}
   _bindType: 1
 --- !u!1 &1495790302
@@ -762,6 +762,7 @@ MonoBehaviour:
   _components:
   - {fileID: 1495790306}
   _identifier: Main
+  _useSceneContext: 0
   _context: {fileID: 0}
   _bindType: 0
 --- !u!114 &1495790310
@@ -778,6 +779,7 @@ MonoBehaviour:
   _components:
   - {fileID: 1495790308}
   _identifier: 
+  _useSceneContext: 0
   _context: {fileID: 0}
   _bindType: 0
 --- !u!82 &1495790311
