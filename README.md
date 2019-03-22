@@ -10,12 +10,12 @@ Tools used for updating:[UnityNpmCI](https://github.com/KappaBull/UnityNpmCI)
 git submodule add -b {CheckRepositoryName}/{Version} https://github.com/KappaBull/UnityNpm.git package/{PackageName}  
   
 Example: Import Zenject ver7.1.0  
-git submodule add -b Zenject/7.1.0 https://github.com/KappaBull/UnityNpm.git package/com.github.svermeulen.zenject  
+git submodule add -b Zenject/7.1.0 https://github.com/KappaBull/UnityNpm.git Packages/com.github.svermeulen.zenject  
 
 ## CheckRepository (MIT License Only)
 ### Framework
-- [Zenject](https://github.com/svermeulen/Zenject)
-- [UniRx](https://github.com/neuecc/UniRx.git)
+- [Zenject(com.github.svermeulen.zenject)](https://github.com/svermeulen/Zenject)
+- [UniRx(com.github.neuecc.unirx)](https://github.com/neuecc/UniRx.git)
 
 ### Util
 - [Graphy](https://github.com/Tayx94/graphy)
