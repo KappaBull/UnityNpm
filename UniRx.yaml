@@ -1,9 +1,0 @@
-repository: https://github.com/neuecc/UniRx.git
-check: tag
-package:
-  name: com.github.neuecc.unirx
-  description: "Reactive Extensions for Unity"
-license: /LICENSE
-copy:
-  - /Assets/Plugins
-  - /Assets/Plugins.meta
