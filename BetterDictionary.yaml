@@ -1,0 +1,9 @@
+repository: https://github.com/komatus/BetterDictionary.git
+check: tag
+package:
+  name: com.github.komatus.betterdictionary
+  description: "Better performance generic Dictionary and HashSet optimized for Unity"
+license: /LICENSE
+copy:
+  - /Assets/Plugins
+  - /Assets/Plugins.meta
