@@ -30,6 +30,9 @@ namespace Tayx.Graphy.Fps
         [SerializeField] private    Shader          ShaderFull = null;
         [SerializeField] private    Shader          ShaderLight = null;
 
+        // This keeps track of whether Init() has run or not
+        [SerializeField] private    bool            m_isInitialized = false;
+
         #endregion
 
         #region Variables -> Private
@@ -50,11 +53,6 @@ namespace Tayx.Graphy.Fps
 
         #region Methods -> Unity Callbacks
 
-        private void OnEnable()
-        {
-            Init();
-        }
-
         private void Update()
         {
             UpdateGraph();
@@ -66,6 +64,12 @@ namespace Tayx.Graphy.Fps
         
         public void UpdateParameters()
         {
+            if (m_shaderGraph == null)
+            {
+                // TODO: While Graphy is disabled (e.g. by default via Ctrl+H) and while in Editor after a Hot-Swap,
+                // the OnApplicationFocus calls this while m_shaderGraph == null, throwing a NullReferenceException
+                return;
+            }
             switch (m_graphyManager.GraphyMode)
             {
                 case GraphyManager.Mode.FULL:
@@ -92,6 +96,13 @@ namespace Tayx.Graphy.Fps
 
         protected override void UpdateGraph()
         {
+            // Since we no longer initialize by default OnEnable(), 
+            // we need to check here, and Init() if needed
+            if (!m_isInitialized)
+            {
+                Init();
+            }
+            
             int fps = (int)(1 / Time.unscaledDeltaTime);
 
             int currentMaxFps = 0;
@@ -118,6 +129,12 @@ namespace Tayx.Graphy.Fps
 
             m_highestFps = m_highestFps < 1 || m_highestFps <= currentMaxFps ? currentMaxFps : m_highestFps - 1;
 
+            if (m_shaderGraph.Array == null)
+            {
+                m_fpsArray                  = new int[m_resolution];
+                m_shaderGraph.Array         = new float[m_resolution];
+            }
+
             for (int i = 0; i <= m_resolution - 1; i++)
             {
                 m_shaderGraph.Array[i]      = m_fpsArray[i] / (float) m_highestFps;
@@ -137,9 +154,11 @@ namespace Tayx.Graphy.Fps
 
         protected override void CreatePoints()
         {
-            m_shaderGraph.Array = new float[m_resolution];
-
-            m_fpsArray = new int[m_resolution];
+            if (m_shaderGraph.Array == null || m_fpsArray.Length != m_resolution)
+            {
+                m_fpsArray              = new int[m_resolution];
+                m_shaderGraph.Array     = new float[m_resolution];
+            }
 
             for (int i = 0; i < m_resolution; i++)
             {
@@ -171,6 +190,8 @@ namespace Tayx.Graphy.Fps
             };
 
             UpdateParameters();
+
+            m_isInitialized = true;
         }
 
         #endregion

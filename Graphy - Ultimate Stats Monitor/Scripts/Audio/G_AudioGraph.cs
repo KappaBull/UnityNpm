@@ -31,6 +31,9 @@ namespace Tayx.Graphy.Audio
         [SerializeField] private    Shader          ShaderFull = null;
         [SerializeField] private    Shader          ShaderLight = null;
 
+        // This keeps track of whether Init() has run or not
+        [SerializeField] private    bool            m_isInitialized = false;
+
         #endregion
 
         #region Variables -> Private
@@ -53,7 +56,21 @@ namespace Tayx.Graphy.Audio
 
         private void OnEnable()
         {
-            Init();
+            /* ----- NOTE: ----------------------------
+             * We used to Init() here regardless of
+             * whether this module was enabled.
+             * The reason we don't Init() here
+             * anymore is that some users are on 
+             * platforms that do not support the arrays 
+             * in the Shaders.
+             *
+             * See: https://github.com/Tayx94/graphy/issues/17
+             * 
+             * Even though we don't Init() competely
+             * here anymore, we still need 
+             * m_audioMonitor for in Update()
+             * --------------------------------------*/
+            m_audioMonitor = GetComponent<G_AudioMonitor>();
         }
 
         private void Update()
@@ -70,6 +87,12 @@ namespace Tayx.Graphy.Audio
 
         public void UpdateParameters()
         {
+            if (m_shaderGraph == null)
+            {
+                // TODO: While Graphy is disabled (e.g. by default via Ctrl+H) and while in Editor after a Hot-Swap,
+                // the OnApplicationFocus calls this while m_shaderGraph == null, throwing a NullReferenceException
+                return;
+            }
             switch (m_graphyManager.GraphyMode)
             {
                 case GraphyManager.Mode.FULL:
@@ -103,6 +126,13 @@ namespace Tayx.Graphy.Audio
 
         protected override void UpdateGraph()
         {
+            // Since we no longer initialize by default OnEnable(), 
+            // we need to check here, and Init() if needed
+            if (!m_isInitialized)
+            {
+                Init();
+            }
+
             int incrementPerIteration = Mathf.FloorToInt(m_audioMonitor.Spectrum.Length / (float)m_resolution);
 
             // Current values -------------------------
@@ -189,11 +219,13 @@ namespace Tayx.Graphy.Audio
         protected override void CreatePoints()
         {
             // Init Arrays
-            m_shaderGraph.Array                     = new float[m_resolution];
-            m_shaderGraphHighestValues.Array        = new float[m_resolution];
-
-            m_graphArray                            = new float[m_resolution];
-            m_graphArrayHighestValue                = new float[m_resolution];
+            if (m_shaderGraph.Array == null || m_shaderGraph.Array.Length != m_resolution)
+            {
+                m_graphArray                                = new float[m_resolution];
+                m_graphArrayHighestValue                    = new float[m_resolution];
+                m_shaderGraph.Array                         = new float[m_resolution];
+                m_shaderGraphHighestValues.Array            = new float[m_resolution];
+            }
 
             for (int i = 0; i < m_resolution; i++)
             {
@@ -254,6 +286,8 @@ namespace Tayx.Graphy.Audio
             };
 
             UpdateParameters();
+
+            m_isInitialized = true;
         }
 
         #endregion
